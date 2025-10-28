@@ -1,24 +1,23 @@
 import ModuleCard from '../components/ModuleCard'
-import { Search, BookOpen, FileText, Target } from 'lucide-react'
+import { Search, BookOpen, FileText } from 'lucide-react'
 
-function ModulesPage({ modules, setSelectedModule, setCurrentPage, searchTerm }) {
-  // Filter modules based on search
+function ModulesPage({ modules, setSelectedModule, setCurrentPage, searchTerm, setSearchTerm }) {
   const filteredModules = modules.filter(module =>
     module.name.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  // Calculate totals
-  const totalLessons = modules.reduce((sum, module) => sum + module.lessons.length, 0)
-  const totalProjects = modules.reduce((sum, module) => sum + module.projects.length, 0)
+  const totalUnits = modules.reduce((sum, module) => sum + (module.units?.length || 0), 0)
+  const totalArticles = modules.reduce((sum, module) => 
+    sum + (module.units?.reduce((s, u) => s + (u.articles?.length || 0), 0) || 0), 0
+  )
 
   return (
     <div>
       <div className="mb-8">
         <h2 className="text-3xl font-bold text-gray-900 mb-2">My Modules</h2>
-        <p className="text-gray-600">Your university course modules</p>
+        <p className="text-gray-600">Digital Marketing courses and content</p>
       </div>
 
-      {/* Stats Cards */}
       {!searchTerm && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
@@ -36,11 +35,11 @@ function ModulesPage({ modules, setSelectedModule, setCurrentPage, searchTerm })
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
             <div className="flex items-center space-x-3">
               <div className="p-3 bg-green-100 rounded-lg">
-                <FileText className="w-6 h-6 text-green-600" />
+                <BookOpen className="w-6 h-6 text-green-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Total Lessons</p>
-                <p className="text-2xl font-bold text-gray-900">{totalLessons}</p>
+                <p className="text-sm text-gray-600">Total Units</p>
+                <p className="text-2xl font-bold text-gray-900">{totalUnits}</p>
               </div>
             </div>
           </div>
@@ -48,11 +47,11 @@ function ModulesPage({ modules, setSelectedModule, setCurrentPage, searchTerm })
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
             <div className="flex items-center space-x-3">
               <div className="p-3 bg-purple-100 rounded-lg">
-                <Target className="w-6 h-6 text-purple-600" />
+                <FileText className="w-6 h-6 text-purple-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Total Projects</p>
-                <p className="text-2xl font-bold text-gray-900">{totalProjects}</p>
+                <p className="text-sm text-gray-600">Total Articles</p>
+                <p className="text-2xl font-bold text-gray-900">{totalArticles}</p>
               </div>
             </div>
           </div>

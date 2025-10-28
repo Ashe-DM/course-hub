@@ -1,22 +1,20 @@
 import { useState } from 'react'
-import { ArrowLeft, Plus, X, FileText, Target } from 'lucide-react'
+import { ArrowLeft, BookOpen, FileText, HelpCircle, Plus } from 'lucide-react'
 
-function ModuleDetailPage({ module, onBack, onAddLesson, onAddProject }) {
-  const [activeTab, setActiveTab] = useState('lessons')
-  const [showAddForm, setShowAddForm] = useState(false)
-  const [formTitle, setFormTitle] = useState('')
-  const [formDescription, setFormDescription] = useState('')
+function ModuleDetailPage({ module, onBack, onAddUnit, onSelectUnit }) {
+  const [showAddUnitForm, setShowAddUnitForm] = useState(false)
+  const [unitTitle, setUnitTitle] = useState('')
+  const [unitDescription, setUnitDescription] = useState('')
 
-  const handleSubmit = () => {
-    if (formTitle.trim()) {
-      if (activeTab === 'lessons') {
-        onAddLesson(module._id, { title: formTitle, description: formDescription })
-      } else {
-        onAddProject(module._id, { title: formTitle, description: formDescription })
-      }
-      setFormTitle('')
-      setFormDescription('')
-      setShowAddForm(false)
+  const handleAddUnit = () => {
+    if (unitTitle.trim()) {
+      onAddUnit(module._id, {
+        title: unitTitle,
+        description: unitDescription
+      })
+      setUnitTitle('')
+      setUnitDescription('')
+      setShowAddUnitForm(false)
     }
   }
 
@@ -30,140 +28,86 @@ function ModuleDetailPage({ module, onBack, onAddLesson, onAddProject }) {
         <span>Back to Modules</span>
       </button>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
-        <h2 className="text-3xl font-bold text-gray-900 mb-6">{module.name}</h2>
-        
-        {/* Tabs */}
-        <div className="flex space-x-6 border-b border-gray-200 mb-6">
-          <button
-            onClick={() => setActiveTab('lessons')}
-            className={`pb-4 px-2 font-medium transition relative ${
-              activeTab === 'lessons' 
-                ? 'text-blue-600' 
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            Lessons ({module.lessons.length})
-            {activeTab === 'lessons' && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
-            )}
-          </button>
-          <button
-            onClick={() => setActiveTab('projects')}
-            className={`pb-4 px-2 font-medium transition relative ${
-              activeTab === 'projects' 
-                ? 'text-blue-600' 
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            Projects ({module.projects.length})
-            {activeTab === 'projects' && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
-            )}
-          </button>
-        </div>
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 mb-6">
+        <h2 className="text-3xl font-bold text-gray-900 mb-2">{module.name}</h2>
+        <p className="text-gray-600">{module.description}</p>
+      </div>
 
-        {/* Add Button */}
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-2xl font-bold text-gray-900">Units</h3>
         <button
-          onClick={() => setShowAddForm(!showAddForm)}
-          className="mb-6 bg-blue-600 text-white px-4 py-2.5 rounded-lg hover:bg-blue-700 flex items-center space-x-2 font-medium transition"
+          onClick={() => setShowAddUnitForm(!showAddUnitForm)}
+          className="bg-blue-600 text-white px-4 py-2.5 rounded-lg hover:bg-blue-700 flex items-center space-x-2 font-medium transition"
         >
           <Plus className="w-5 h-5" />
-          <span>Add {activeTab === 'lessons' ? 'Lesson' : 'Project'}</span>
+          <span>Add Unit</span>
         </button>
+      </div>
 
-        {/* Add Form */}
-        {showAddForm && (
-          <div className="bg-gray-50 p-6 rounded-xl mb-6 border border-gray-200">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">
-                Add New {activeTab === 'lessons' ? 'Lesson' : 'Project'}
-              </h3>
-              <button
-                onClick={() => setShowAddForm(false)}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            
-            <input
-              type="text"
-              placeholder="Title"
-              value={formTitle}
-              onChange={(e) => setFormTitle(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg mb-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-            <textarea
-              placeholder="Description (optional)"
-              value={formDescription}
-              onChange={(e) => setFormDescription(e.target.value)}
-              rows="4"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-            <div className="flex space-x-3">
-              <button
-                onClick={handleSubmit}
-                className="bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 font-medium transition"
-              >
-                Save
-              </button>
-              <button
-                onClick={() => setShowAddForm(false)}
-                className="bg-white border border-gray-300 text-gray-700 px-6 py-2.5 rounded-lg hover:bg-gray-50 font-medium transition"
-              >
-                Cancel
-              </button>
-            </div>
+      {showAddUnitForm && (
+        <div className="bg-gray-50 p-6 rounded-xl mb-6 border border-gray-200">
+          <h4 className="font-semibold text-gray-900 mb-4">Add New Unit</h4>
+          <input
+            type="text"
+            placeholder="Unit title"
+            value={unitTitle}
+            onChange={(e) => setUnitTitle(e.target.value)}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg mb-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <textarea
+            placeholder="Unit description"
+            value={unitDescription}
+            onChange={(e) => setUnitDescription(e.target.value)}
+            rows="3"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <div className="flex space-x-3">
+            <button
+              onClick={handleAddUnit}
+              className="bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700"
+            >
+              Save
+            </button>
+            <button
+              onClick={() => setShowAddUnitForm(false)}
+              className="bg-white border border-gray-300 text-gray-700 px-6 py-2.5 rounded-lg hover:bg-gray-50"
+            >
+              Cancel
+            </button>
           </div>
-        )}
-
-        {/* Content */}
-        <div className="space-y-3">
-          {activeTab === 'lessons' && (
-            <>
-              {module.lessons.length === 0 ? (
-                <div className="text-center py-12 text-gray-500">
-                  <FileText className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-                  <p>No lessons yet. Add your first lesson above!</p>
-                </div>
-              ) : (
-                module.lessons.map((lesson, index) => (
-                  <div key={index} className="bg-gray-50 p-5 rounded-lg border border-gray-200 hover:border-blue-200 transition">
-                    <h4 className="font-semibold text-gray-900 text-lg mb-1">
-                      {lesson.title || lesson}
-                    </h4>
-                    {lesson.description && (
-                      <p className="text-gray-600 text-sm mt-2">{lesson.description}</p>
-                    )}
-                  </div>
-                ))
-              )}
-            </>
-          )}
-
-          {activeTab === 'projects' && (
-            <>
-              {module.projects.length === 0 ? (
-                <div className="text-center py-12 text-gray-500">
-                  <Target className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-                  <p>No projects yet. Add your first project above!</p>
-                </div>
-              ) : (
-                module.projects.map((project, index) => (
-                  <div key={index} className="bg-gray-50 p-5 rounded-lg border border-gray-200 hover:border-blue-200 transition">
-                    <h4 className="font-semibold text-gray-900 text-lg mb-1">
-                      {project.title || project}
-                    </h4>
-                    {project.description && (
-                      <p className="text-gray-600 text-sm mt-2">{project.description}</p>
-                    )}
-                  </div>
-                ))
-              )}
-            </>
-          )}
         </div>
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {module.units?.length === 0 ? (
+          <div className="col-span-full text-center py-12 bg-white rounded-xl border border-gray-200">
+            <BookOpen className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+            <p className="text-gray-500">No units yet. Add your first unit above!</p>
+          </div>
+        ) : (
+          module.units?.map((unit) => (
+            <div
+              key={unit._id}
+              onClick={() => onSelectUnit(unit)}
+              className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition cursor-pointer group"
+            >
+              <h4 className="font-semibold text-lg text-gray-900 mb-2 group-hover:text-blue-600">
+                {unit.title}
+              </h4>
+              <p className="text-sm text-gray-600 mb-4 line-clamp-2">{unit.description}</p>
+              <div className="flex items-center space-x-4 text-sm text-gray-500">
+                <div className="flex items-center space-x-1">
+                  <FileText className="w-4 h-4" />
+                  <span>{unit.articles?.length || 0} articles</span>
+                </div>
+                <div className="flex items-center space-x-1">
+                  <HelpCircle className="w-4 h-4" />
+                  <span>{unit.quizzes?.length || 0} quizzes</span>
+                </div>
+              </div>
+            </div>
+          ))
+        )}
       </div>
     </div>
   )
