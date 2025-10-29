@@ -1,8 +1,11 @@
-import { Search, X } from 'lucide-react'
+import { Search, X, Moon, Sun } from 'lucide-react'
+import { useTheme } from '../context/ThemeContext'
 
 function TopNav({ searchTerm, setSearchTerm }) {
+  const { darkMode, toggleDarkMode } = useTheme()
+
   return (
-    <header className="bg-white shadow-sm border-b border-gray-200 h-16 flex items-center px-6 ml-64 fixed top-0 right-0 left-64 z-10">
+    <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 h-16 flex items-center px-6 ml-64">
       <div className="flex-1 flex items-center justify-between max-w-7xl">
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -11,20 +14,36 @@ function TopNav({ searchTerm, setSearchTerm }) {
             placeholder="Search courses, lessons..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-10 py-2 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition"
+            className="w-full pl-10 pr-10 py-2 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-gray-100 transition"
           />
           {searchTerm && (
             <button
               onClick={() => setSearchTerm('')}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
             >
               <X className="w-5 h-5" />
             </button>
           )}
         </div>
-        <button className="ml-6 bg-gray-900 text-white px-6 py-2 rounded-lg hover:bg-gray-800 font-medium transition">
-          Sign In
-        </button>
+        
+        <div className="flex items-center space-x-4">
+          {/* Dark Mode Toggle */}
+          <button
+            onClick={toggleDarkMode}
+            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+            aria-label="Toggle dark mode"
+          >
+            {darkMode ? (
+              <Sun className="w-5 h-5 text-yellow-500" />
+            ) : (
+              <Moon className="w-5 h-5 text-gray-600" />
+            )}
+          </button>
+
+          <button className="bg-gray-900 dark:bg-gray-700 text-white px-6 py-2 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-600 font-medium transition">
+            Sign In
+          </button>
+        </div>
       </div>
     </header>
   )

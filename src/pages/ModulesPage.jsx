@@ -2,13 +2,16 @@ import ModuleCard from '../components/ModuleCard'
 import { Search, BookOpen, FileText } from 'lucide-react'
 
 function ModulesPage({ modules, setSelectedModule, setCurrentPage, searchTerm, setSearchTerm }) {
-  const filteredModules = modules.filter(module =>
+  // Safety check - ensure modules is an array
+  const moduleList = Array.isArray(modules) ? modules : []
+  
+  const filteredModules = moduleList.filter(module =>
     module.name.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  const totalUnits = modules.reduce((sum, module) => sum + (module.units?.length || 0), 0)
-  const totalArticles = modules.reduce((sum, module) => 
-    sum + (module.units?.reduce((s, u) => s + (u.articles?.length || 0), 0) || 0), 0
+  const totalUnits = moduleList.reduce((sum, module) => sum + (module.units?.length || 0), 0)
+  const totalArticles = moduleList.reduce((sum, module) => 
+    sum + (module.units?.reduce((s, u) => s + (u.items?.length || 0), 0) || 0), 0
   )
 
   return (

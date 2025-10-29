@@ -2,9 +2,10 @@ import axios from 'axios';
 
 // Use environment variable for backend base URL
 const API = axios.create({
-  baseURL: `${import.meta.env.VITE_API_URL}/api/modules`,
+  baseURL: import.meta.env.VITE_API_URL 
+    ? `${import.meta.env.VITE_API_URL}/api/modules`
+    : 'http://localhost:5000/api/modules'
 });
-
 // Fetch all modules
 export const getAllModules = async () => {
   const response = await API.get('/');

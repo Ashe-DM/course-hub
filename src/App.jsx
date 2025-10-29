@@ -99,7 +99,7 @@ function App() {
         </>
       )}
       
-      <main className={currentPage !== 'itemPresentation' ? 'ml-64 pt-20 p-8' : ''}>
+      <main className={currentPage !== 'itemPresentation' ? 'ml-64 p-8' : ''}>
         <div className={currentPage !== 'itemPresentation' ? 'max-w-7xl mx-auto' : ''}>
           {currentPage === 'dashboard' && <ComingSoonPage title="Dashboard" />}
           

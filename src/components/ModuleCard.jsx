@@ -53,7 +53,7 @@ function ModuleCard({ module, onClick }) {
           <span className="text-xs">Updated recently</span>
         </div>
 
-        {/* Stats */}
+        {/* Stats
         <div className="flex items-center justify-between pt-4 border-t border-gray-200">
           <div className="text-center">
             <p className="text-2xl font-bold text-gray-900">Free</p>
@@ -67,7 +67,14 @@ function ModuleCard({ module, onClick }) {
             <p className="text-2xl font-bold text-gray-900">{totalItems}</p>
             <p className="text-xs text-gray-500">Items</p>
           </div>
-        </div>
+        </div> */}
+        {/* Footer */}
+        {/* <div className="pt-4 border-t border-gray-200">
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-blue-600 font-medium">{totalItems} learning items</span>
+            <span className="text-gray-500">Updated recently</span>
+          </div>
+        </div> */}
       </div>
     </div>
   )
