@@ -17,6 +17,33 @@ function App() {
   const [modules, setModules] = useState([])
   const [loading, setLoading] = useState(true)
 
+
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.text = JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "EducationalOrganization",
+      "name": "Digital Marketing Hub",
+      "description": "A collaborative platform for digital marketing education",
+      "url": window.location.origin,
+      "offers": {
+        "@type": "Offer",
+        "category": "Education",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    });
+    document.head.appendChild(script);
+
+    return () => {
+      if (script.parentNode) {
+        script.parentNode.removeChild(script);
+      }
+    };
+  }, []);
+
+
   useEffect(() => {
     loadModules()
   }, [])
