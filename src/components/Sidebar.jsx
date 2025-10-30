@@ -1,6 +1,8 @@
-import { Home, BookOpen, FileText, Lightbulb } from 'lucide-react'
+import { Home, BookOpen, FileText, Lightbulb, LogOut } from 'lucide-react'
+import { useUser } from '../context/UserContext';
 
 function Sidebar({ currentPage, setCurrentPage }) {
+  const { logout } = useUser();
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: Home },
     { id: 'modules', label: 'My Modules', icon: BookOpen },
@@ -37,6 +39,10 @@ function Sidebar({ currentPage, setCurrentPage }) {
             </button>
           )
         })}
+        <button onClick={logout} className="...">
+        <LogOut className="w-5 h-5" />
+        Sign Out
+      </button>
       </nav>
     </div>
   )

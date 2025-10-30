@@ -1,8 +1,11 @@
 import { Search, X, Moon, Sun } from 'lucide-react'
 import { useTheme } from '../context/ThemeContext'
+import { useUser } from '../context/UserContext';
+
 
 function TopNav({ searchTerm, setSearchTerm }) {
   const { darkMode, toggleDarkMode } = useTheme()
+  const { user } = useUser();
 
   return (
     <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 h-16 flex items-center px-6 ml-64">
@@ -43,6 +46,12 @@ function TopNav({ searchTerm, setSearchTerm }) {
           <button className="bg-gray-900 dark:bg-gray-700 text-white px-6 py-2 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-600 font-medium transition">
             Sign In
           </button>
+        </div>
+      </div>
+      <div className="flex items-center gap-3">
+        <span>{user?.name}</span>
+        <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white">
+          {user?.avatar || user?.name?.charAt(0)}
         </div>
       </div>
     </header>
