@@ -136,6 +136,7 @@ function RichTextEditor({ value, onChange, readOnly = false }) {
           onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
           className={`p-2 rounded hover:bg-gray-200 text-sm font-bold ${editor.isActive('heading', { level: 3 }) ? 'bg-gray-300' : ''}`}
           title="Heading 3">
+            <Heading3 className="w-4 h-4" />
         </button>
 
         <div className="w-px h-6 bg-gray-300 mx-1"></div>

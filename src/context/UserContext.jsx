@@ -156,7 +156,7 @@ export function UserProvider({ children }) {
   };
 
   const isAdmin = () => user?.role === 'admin';
-  const isInstructor = () => user?.role === 'instructor' || user?.role === 'admin';
+  const isMentor = () => user?.role === 'mentor' || user?.role === 'admin';
   const isStudent = () => user?.role === 'student';
 
   return (
@@ -169,7 +169,7 @@ export function UserProvider({ children }) {
         logout,
         updateProfile,
         isAdmin,
-        isInstructor,
+        isMentor,
         isStudent,
         isAuthenticated: !!user
       }}
