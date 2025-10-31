@@ -21,12 +21,16 @@ function ModuleCard({ module }) {
     >
       {/* Image Header */}
       <div 
-        className="relative h-48 bg-cover bg-center flex items-center justify-center"
-        style={{ backgroundImage: module.imageUrl ? `url(${module.imageUrl})` : 'none', backgroundColor: module.imageUrl ? 'transparent' : '#4F46E5' }}
+        className="relative h-48 bg-gradient-to-br from-blue-500 to-purple-600 bg-cover bg-center flex items-center justify-center"
+        style={{ 
+          backgroundImage: module.imageUrl ? `url(${module.imageUrl})` : 'none'
+        }}
       >
-        {/* Dark overlay for better text readability */}
-        <div className="absolute inset-0 bg-black bg-opacity-30"></div>
-        <BookOpen className="w-16 h-16 text-white opacity-90 relative z-10" />
+        {/* Dark overlay only if there's an image */}
+        {module.imageUrl && <div className="absolute inset-0 bg-black bg-opacity-30"></div>}
+        
+        {/* Show icon only if no image */}
+        {!module.imageUrl && <BookOpen className="w-16 h-16 text-white opacity-90 relative z-10" />}
         
         <div className="absolute top-4 left-4 z-10">
           <span className="px-3 py-1 bg-white text-blue-600 rounded-full text-xs font-semibold">

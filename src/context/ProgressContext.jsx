@@ -1,23 +1,27 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { getUserProgress, markItemComplete, getAllUserProgress } from '../api/moduleApi';
-import { useUser } from './UserContext';
 
 const ProgressContext = createContext();
 
 export function ProgressProvider({ children }) {
   const [completedItems, setCompletedItems] = useState(new Set());
   const [progressData, setProgressData] = useState({});
-  const { user } = useUser();
+  const [user, setUser] = useState(null);
 
   // Load user progress when user changes
   useEffect(() => {
-    if (user) {
-      loadAllProgress();
-    } else {
-      setCompletedItems(new Set());
-      setProgressData({});
+    // Get user from localStorage
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      try {
+        const userData = JSON.parse(storedUser);
+        setUser(userData);
+        loadAllProgress();
+      } catch (error) {
+        console.error('Error parsing user data:', error);
+      }
     }
-  }, [user]);
+  }, []);
 
   const loadAllProgress = async () => {
     try {

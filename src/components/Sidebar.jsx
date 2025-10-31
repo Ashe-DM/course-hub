@@ -11,7 +11,7 @@ function Sidebar({ currentPage, setCurrentPage }) {
   ]
 
   return (
-    <div className="w-64 bg-white dark:bg-gray-800 h-screen shadow-lg fixed left-0 top-0 border-r border-gray-200 dark:border-gray-700">
+    <div className="w-64 bg-white dark:bg-gray-800 h-screen shadow-lg border-r border-gray-200 dark:border-gray-700">
       <div className="p-6 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center space-x-2">
           <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
@@ -39,11 +39,14 @@ function Sidebar({ currentPage, setCurrentPage }) {
             </button>
           )
         })}
-        <button onClick={logout} className="...">
-        <LogOut className="w-5 h-5" />
-        Sign Out
-      </button>
       </nav>
+      <button 
+        onClick={logout} 
+        className="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 transition text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 mt-4"
+      >
+        <LogOut className="w-5 h-5" />
+        <span>Sign Out</span>
+      </button>
     </div>
   )
 }
