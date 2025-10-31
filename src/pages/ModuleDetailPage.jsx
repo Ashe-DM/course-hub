@@ -162,17 +162,17 @@ function ModuleDetailPage() {
                 className="flex items-center space-x-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
               >
                 <Plus className="w-4 h-4" />
-                <span>Add Unit</span>
+                <span>Add Week</span>
               </button>
             </div>
 
             {/* Add Unit Form */}
             {showAddUnitForm && (
               <form onSubmit={handleAddUnit} className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                <h3 className="font-semibold mb-3">Create New Unit</h3>
+                <h3 className="font-semibold mb-3">Create New Week</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Unit Title *</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Week Title *</label>
                     <input
                       type="text"
                       value={newUnitData.title}
@@ -189,7 +189,7 @@ function ModuleDetailPage() {
                       value={newUnitData.description}
                       onChange={(e) => setNewUnitData({ ...newUnitData, description: e.target.value })}
                       className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                      placeholder="Brief description of this unit"
+                      placeholder="Brief description of this week"
                     />
                   </div>
                 </div>
@@ -198,7 +198,7 @@ function ModuleDetailPage() {
                     type="submit"
                     className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
                   >
-                    Create Unit
+                    Create Week
                   </button>
                   <button
                     type="button"
@@ -218,10 +218,10 @@ function ModuleDetailPage() {
                   <div className="flex items-start gap-3 flex-1">
                     <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" />
                     <div className="flex-1">
-                      <h3 className="font-semibold text-gray-900">Unit {index + 1}: {unit.title}</h3>
+                      <h3 className="font-semibold text-gray-900">Week {index + 1}: {unit.title}</h3>
                       <p className="text-gray-600 text-sm mt-1">{unit.description}</p>
                       <p className="text-gray-500 text-xs mt-2">
-                        {unit.items?.length || 0} items • {((unit.items?.length || 0) * 15)} min
+                        {unit.items?.length || 0} lessons • {((unit.items?.length || 0) * 15)} min
                       </p>
                     </div>
                   </div>
@@ -229,10 +229,10 @@ function ModuleDetailPage() {
                   <button
                     onClick={() => handleManageItems(unit)}
                     className="flex items-center space-x-2 bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm"
-                    title="Manage items in this unit"
+                    title="Manage lessons in this week"
                   >
                     <Settings className="w-4 h-4" />
-                    <span>Manage Items</span>
+                    <span>Manage Lessons</span>
                   </button>
                 </div>
               ))}
@@ -240,8 +240,8 @@ function ModuleDetailPage() {
               {(!module.units || module.units.length === 0) && (
                 <div className="text-center py-8 text-gray-500 border-2 border-dashed border-gray-300 rounded-lg">
                   <BookOpen className="w-12 h-12 mx-auto mb-3 text-gray-400" />
-                  <p className="mb-2">No units created yet.</p>
-                  <p className="text-sm">Click "Add Unit" above to create your first unit.</p>
+                  <p className="mb-2">No weeks created yet.</p>
+                  <p className="text-sm">Click "Add Week" above to create your first week.</p>
                 </div>
               )}
             </div>
@@ -254,7 +254,7 @@ function ModuleDetailPage() {
             <div className="bg-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
               <div className="p-6">
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-xl font-bold text-gray-900">Manage Items in "{selectedUnit.title}"</h3>
+                  <h3 className="text-xl font-bold text-gray-900">Manage Lessons in "{selectedUnit.title}"</h3>
                   <button
                     onClick={() => {
                       setShowItemManager(false);

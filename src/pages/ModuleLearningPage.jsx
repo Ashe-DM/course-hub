@@ -3,7 +3,10 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, ChevronDown, ChevronUp, FileText, Video, ClipboardCheck } from 'lucide-react';
 import { getModuleById } from '../api/moduleApi';
 import { useProgress } from '../context/ProgressContext';
-import MarkdownEditor from '../components/MarkdownEditor';
+import rehypeRaw from 'rehype-raw';
+import rehypeHighlight from 'rehype-highlight';
+import 'highlight.js/styles/github.css';
+import RichTextEditor from '../components/RichTextEditor';
 
 function ModuleLearningPage() {
   const { moduleId, weekId, itemId, unitId } = useParams();
@@ -242,7 +245,7 @@ function ModuleLearningPage() {
                 {(currentItem.type === 'article' || currentItem.type === 'reading' || currentItem.type === 'lab') && (
                   <div className="prose max-w-none">
                     {currentItem.content ? (
-                      <MarkdownEditor 
+                      <RichTextEditor
                         value={currentItem.content} 
                         readOnly={true}
                       />

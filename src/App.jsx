@@ -142,34 +142,10 @@ function AppContent() {
           <Route path="resources" element={<ComingSoonPage title="Resources" />} />
         </Route>
 
-        {/* Protected Routes WITHOUT Sidebar (Full Screen) */}
-        <Route 
-          path="/modules/:moduleId" 
-          element={
-            <ProtectedRoute>
-              <ModuleDetailPage />
-            </ProtectedRoute>
-          } 
-        />
-        
-        <Route 
-          path="/modules/:moduleId/learn/:weekId/:itemId" 
-          element={
-            <ProtectedRoute>
-              <ModuleLearningPage />
-            </ProtectedRoute>
-          } 
-        />
-        
-        {/* Also support unitId for backward compatibility */}
-        <Route 
-          path="/modules/:moduleId/learn/:unitId/:itemId" 
-          element={
-            <ProtectedRoute>
-              <ModuleLearningPage />
-            </ProtectedRoute>
-          } 
-        />
+        {/* Module pages WITH Sidebar */}
+        <Route path="/modules/:moduleId" element={<ModuleDetailPage />} />
+        <Route path="/modules/:moduleId/learn/:weekId/:itemId" element={<ModuleLearningPage />} />
+        <Route path="/modules/:moduleId/learn/:unitId/:itemId" element={<ModuleLearningPage />} />
       </Routes>
     </Router>
   );
