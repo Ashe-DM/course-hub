@@ -1,277 +1,358 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { BookOpen, CheckCircle, Settings, Plus } from 'lucide-react';
-import { getModuleById, addWeek } from '../api/moduleApi';
-import ItemManager from '../components/ItemManager';
+import { 
+  ArrowLeft, Play, CheckCircle, Lock, Star, Clock, 
+  Users, Award, BookOpen, Video, FileText, Code, CheckSquare,
+  ChevronDown, ChevronUp
+} from 'lucide-react';
+import { getModuleById, enrollUser } from '../api/moduleApi';
+import { useProgress } from '../context/ProgressContext';
+import { useUser } from '../context/UserContext';
 
 function ModuleDetailPage() {
   const { moduleId } = useParams();
   const navigate = useNavigate();
+  const { user } = useUser();
+  const { getModuleProgress, isCompleted, loadModuleProgress } = useProgress();
   const [module, setModule] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [showItemManager, setShowItemManager] = useState(false);
-  const [selectedUnit, setSelectedUnit] = useState(null);
-  const [showAddUnitForm, setShowAddUnitForm] = useState(false);
-  const [newUnitData, setNewUnitData] = useState({ title: '', description: '' });
+  const [enrolling, setEnrolling] = useState(false);
+  const [expandedUnits, setExpandedUnits] = useState([0]); // First unit expanded by default
 
   useEffect(() => {
-    fetchModule();
+    loadModule();
   }, [moduleId]);
 
-  const fetchModule = async () => {
+  const loadModule = async () => {
     try {
+      setLoading(true);
       const data = await getModuleById(moduleId);
       setModule(data);
-      setLoading(false);
+      await loadModuleProgress(moduleId);
     } catch (error) {
-      console.error('Error fetching module:', error);
+      console.error('Error loading module:', error);
+    } finally {
       setLoading(false);
     }
   };
 
-  const handleGetStarted = () => {
-    if (module.units && module.units.length > 0) {
-      const firstUnit = module.units[0];
-      if (firstUnit.items && firstUnit.items.length > 0) {
-        const firstItem = firstUnit.items[0];
-        navigate(`/modules/${moduleId}/learn/${firstUnit._id}/${firstItem._id}`);
-      } else {
-        alert('This unit has no content yet.');
-      }
-    } else {
-      alert('This module has no content yet. Please check back later.');
-    }
-  };
-
-  const handleAddUnit = async (e) => {
-    e.preventDefault();
+  const handleEnroll = async () => {
     try {
-      const newModule = await addWeek(moduleId, newUnitData);
-      setModule(newModule);
-      setNewUnitData({ title: '', description: '' });
-      setShowAddUnitForm(false);
-      
-      // Auto-open the item manager for the new unit
-      const newUnit = newModule.units[newModule.units.length - 1];
-      setSelectedUnit(newUnit);
-      setShowItemManager(true);
+      setEnrolling(true);
+      await enrollUser(moduleId);
+      await loadModule(); // Reload to get updated enrollment status
+      alert('Successfully enrolled! You can now start learning.');
     } catch (error) {
-      console.error('Error adding unit:', error);
-      alert('Failed to create unit: ' + error.message);
+      console.error('Error enrolling:', error);
+      alert('Failed to enroll. Please try again.');
+    } finally {
+      setEnrolling(false);
     }
   };
 
-  const handleManageItems = (unit) => {
-    setSelectedUnit(unit);
-    setShowItemManager(true);
+  const toggleUnit = (index) => {
+    setExpandedUnits(prev => 
+      prev.includes(index) 
+        ? prev.filter(i => i !== index)
+        : [...prev, index]
+    );
   };
 
-  const handleItemUpdated = async () => {
-    // Refresh module data
-    await fetchModule();
+  const getItemIcon = (type) => {
+    switch (type) {
+      case 'video': return Video;
+      case 'article':
+      case 'reading': return FileText;
+      case 'quiz':
+      case 'test': return CheckSquare;
+      case 'lab': return Code;
+      default: return BookOpen;
+    }
+  };
+
+  const startLearning = (unitId, itemId) => {
+    navigate(`/modules/${moduleId}/learn/${unitId}/${itemId}`);
+  };
+
+  const getCategoryColor = (category) => {
+    const colors = {
+      'digital marketing': 'bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400',
+      'project management': 'bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400',
+      'data science': 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400',
+      'legal': 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400',
+    };
+    return colors[category?.toLowerCase()] || 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400';
   };
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50">
-        <div className="text-lg text-gray-600">Loading...</div>
+      <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="text-lg text-gray-600 dark:text-gray-400">Loading module...</div>
       </div>
     );
   }
 
   if (!module) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50">
-        <div className="text-lg text-gray-600">Module not found</div>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Module not found</h2>
+        <button
+          onClick={() => navigate('/modules')}
+          className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+        >
+          Back to Modules
+        </button>
       </div>
     );
   }
 
-  const moduleTitle = module.title || module.name;
-  const totalWeeks = module.units?.length || 0;
-  const totalItems = module.units?.reduce((sum, week) => sum + (week.items?.length || 0), 0) || 0;
-  const totalAssessments = module.units?.reduce((sum, week) => 
-    sum + (week.items?.filter(item => item.type === 'test' || item.type === 'quiz').length || 0), 0) || 0;
+  const progress = getModuleProgress(module);
+  const totalItems = module.units?.reduce((sum, unit) => sum + (unit.items?.length || 0), 0) || 0;
+  const completedCount = module.units?.reduce(
+    (sum, unit) => sum + (unit.items?.filter(item => isCompleted(item._id)).length || 0),
+    0
+  ) || 0;
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="w-full max-w-6xl mx-auto">
-        {/* Back Button */}
-        <button
-          onClick={() => navigate('/modules')}
-          className="mb-4 text-gray-600 hover:text-gray-900 flex items-center gap-2"
-        >
-          ← Back to Modules
-        </button>
-
-        {/* Module Header */}
-        <div className="bg-white rounded-2xl shadow-lg overflow-hidden mb-6">
-          <div 
-            className="h-56 bg-cover bg-center flex items-center justify-center relative"
-            style={{ 
-              backgroundImage: module.imageUrl ? `url(${module.imageUrl})` : 'none',
-              backgroundColor: module.imageUrl ? 'transparent' : '#4F46E5'
-            }}
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      {/* Back Button */}
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+        <div className="max-w-7xl mx-auto px-8 py-4">
+          <button
+            onClick={() => navigate('/modules')}
+            className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
           >
-            <div className="absolute inset-0 bg-black bg-opacity-40"></div>
-            <BookOpen className="w-24 h-24 text-white relative z-10" strokeWidth={1.5} />
-          </div>
-
-          <div className="p-8">
-            <h1 className="text-4xl font-bold text-gray-900 mb-3">
-              {moduleTitle}
-            </h1>
-            <p className="text-lg text-gray-600 mb-8">
-              {module.description}
-            </p>
-
-            {/* Stats */}
-            <div className="grid grid-cols-3 gap-6 mb-10 pb-8 border-b border-gray-200">
-              <div className="text-center">
-                <div className="text-5xl font-bold text-gray-900 mb-2">{totalWeeks}</div>
-                <div className="text-sm text-gray-600">Units</div>
-              </div>
-              <div className="text-center">
-                <div className="text-5xl font-bold text-gray-900 mb-2">{totalItems}</div>
-                <div className="text-sm text-gray-600">Learning Items</div>
-              </div>
-              <div className="text-center">
-                <div className="text-5xl font-bold text-gray-900 mb-2">{totalAssessments}</div>
-                <div className="text-sm text-gray-600">Assessments</div>
-              </div>
-            </div>
-
-            {/* Start Learning Button */}
-            <button
-              onClick={handleGetStarted}
-              className="w-full bg-blue-600 text-white py-4 px-6 rounded-lg text-lg font-semibold hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
-              disabled={!module.units || module.units.length === 0}
-            >
-              {(!module.units || module.units.length === 0) ? 'No Content Available' : 'Start Learning'}
-            </button>
-          </div>
+            <ArrowLeft className="w-5 h-5" />
+            <span>Back to Modules</span>
+          </button>
         </div>
+      </div>
 
-        {/* Course Content */}
-        <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-          <div className="p-8">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">Course Content</h2>
-              <button
-                onClick={() => setShowAddUnitForm(true)}
-                className="flex items-center space-x-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Add Week</span>
-              </button>
-            </div>
+      {/* Hero Section */}
+      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+        <div className="max-w-7xl mx-auto px-8 py-12">
+          <div className="flex flex-col lg:flex-row gap-8 items-start">
+            {/* Left Side - Module Info */}
+            <div className="flex-1">
+              <span className={`inline-block px-3 py-1 rounded-full text-sm font-semibold mb-4 ${getCategoryColor(module.category)}`}>
+                {module.category || 'Digital Marketing'}
+              </span>
+              <h1 className="text-4xl font-bold mb-4">
+                {module.title || module.name}
+              </h1>
+              <p className="text-lg text-blue-100 mb-6">
+                {module.description || 'No description available'}
+              </p>
 
-            {/* Add Unit Form */}
-            {showAddUnitForm && (
-              <form onSubmit={handleAddUnit} className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                <h3 className="font-semibold mb-3">Create New Week</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Week Title *</label>
-                    <input
-                      type="text"
-                      value={newUnitData.title}
-                      onChange={(e) => setNewUnitData({ ...newUnitData, title: e.target.value })}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                      required
-                      placeholder="e.g., Introduction to SEO"
+              {/* Meta Info */}
+              <div className="flex flex-wrap gap-6 text-sm">
+                <div className="flex items-center gap-2">
+                  <Star className="w-5 h-5 text-yellow-400 fill-yellow-400" />
+                  <span className="font-semibold">{module.rating || 4.8}</span>
+                  <span className="text-blue-200">({module.students?.length || Math.floor(Math.random() * 5000)})</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Clock className="w-5 h-5" />
+                  <span>{module.totalMinutes || 120} min</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <BookOpen className="w-5 h-5" />
+                  <span>{totalItems} lessons</span>
+                </div>
+              </div>
+
+              {/* Progress Bar (if enrolled) */}
+              {progress > 0 && (
+                <div className="mt-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-semibold">Your Progress</span>
+                    <span className="text-sm font-semibold">{progress}%</span>
+                  </div>
+                  <div className="w-full h-3 bg-white/20 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-white transition-all duration-500"
+                      style={{ width: `${progress}%` }}
                     />
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                    <input
-                      type="text"
-                      value={newUnitData.description}
-                      onChange={(e) => setNewUnitData({ ...newUnitData, description: e.target.value })}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                      placeholder="Brief description of this week"
-                    />
-                  </div>
-                </div>
-                <div className="flex space-x-3">
-                  <button
-                    type="submit"
-                    className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
-                  >
-                    Create Week
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setShowAddUnitForm(false)}
-                    className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
-            )}
-
-            {/* Units List */}
-            <div className="space-y-4">
-              {module.units?.map((unit, index) => (
-                <div key={unit._id} className="flex items-start justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                  <div className="flex items-start gap-3 flex-1">
-                    <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" />
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-gray-900">Week {index + 1}: {unit.title}</h3>
-                      <p className="text-gray-600 text-sm mt-1">{unit.description}</p>
-                      <p className="text-gray-500 text-xs mt-2">
-                        {unit.items?.length || 0} lessons • {((unit.items?.length || 0) * 15)} min
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <button
-                    onClick={() => handleManageItems(unit)}
-                    className="flex items-center space-x-2 bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm"
-                    title="Manage lessons in this week"
-                  >
-                    <Settings className="w-4 h-4" />
-                    <span>Manage Lessons</span>
-                  </button>
-                </div>
-              ))}
-
-              {(!module.units || module.units.length === 0) && (
-                <div className="text-center py-8 text-gray-500 border-2 border-dashed border-gray-300 rounded-lg">
-                  <BookOpen className="w-12 h-12 mx-auto mb-3 text-gray-400" />
-                  <p className="mb-2">No weeks created yet.</p>
-                  <p className="text-sm">Click "Add Week" above to create your first week.</p>
+                  <p className="text-sm text-blue-100 mt-2">
+                    {completedCount} of {totalItems} lessons completed
+                  </p>
                 </div>
               )}
             </div>
-          </div>
-        </div>
 
-        {/* Item Manager Modal */}
-        {showItemManager && selectedUnit && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-              <div className="p-6">
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-xl font-bold text-gray-900">Manage Lessons in "{selectedUnit.title}"</h3>
-                  <button
-                    onClick={() => {
-                      setShowItemManager(false);
-                      setSelectedUnit(null);
-                    }}
-                    className="text-gray-500 hover:text-gray-700 text-2xl"
-                  >
-                    ×
-                  </button>
+            {/* Right Side - Action Card */}
+            <div className="w-full lg:w-96 bg-white dark:bg-gray-800 rounded-xl p-6 shadow-xl">
+              {/* Module Image */}
+              <div className="aspect-video bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg mb-4 flex items-center justify-center overflow-hidden">
+                {module.imageUrl ? (
+                  <img src={module.imageUrl} alt={module.title} className="w-full h-full object-cover" />
+                ) : (
+                  <BookOpen className="w-16 h-16 text-white opacity-50" />
+                )}
+              </div>
+
+              {/* Action Button */}
+              {progress > 0 ? (
+                <button
+                  onClick={() => {
+                    // Find first incomplete item
+                    for (const unit of module.units || []) {
+                      const incompleteItem = unit.items?.find(item => !isCompleted(item._id));
+                      if (incompleteItem) {
+                        startLearning(unit._id, incompleteItem._id);
+                        return;
+                      }
+                    }
+                    // If all complete, start from beginning
+                    if (module.units?.[0]?.items?.[0]) {
+                      startLearning(module.units[0]._id, module.units[0].items[0]._id);
+                    }
+                  }}
+                  className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors font-semibold flex items-center justify-center gap-2 mb-4"
+                >
+                  <Play className="w-5 h-5" />
+                  Continue Learning
+                </button>
+              ) : (
+                <button
+                  onClick={handleEnroll}
+                  disabled={enrolling}
+                  className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors font-semibold flex items-center justify-center gap-2 mb-4 disabled:bg-blue-300"
+                >
+                  {enrolling ? 'Enrolling...' : 'Start Learning'}
+                </button>
+              )}
+
+              {/* Course Includes */}
+              <div className="space-y-3 text-sm text-gray-700 dark:text-gray-300">
+                <h3 className="font-semibold text-gray-900 dark:text-white">This course includes:</h3>
+                <div className="flex items-center gap-2">
+                  <Video className="w-4 h-4 text-blue-600" />
+                  <span>Video lessons</span>
                 </div>
-                <ItemManager
-                  moduleId={moduleId}
-                  unit={selectedUnit}
-                  onItemUpdated={handleItemUpdated}
-                />
+                <div className="flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-blue-600" />
+                  <span>Reading materials</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckSquare className="w-4 h-4 text-blue-600" />
+                  <span>Quizzes and assessments</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Award className="w-4 h-4 text-blue-600" />
+                  <span>Certificate of completion</span>
+                </div>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Course Content */}
+      <div className="max-w-7xl mx-auto px-8 py-12">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Course Content</h2>
+
+        <div className="space-y-4">
+          {module.units?.map((unit, unitIndex) => {
+            const isExpanded = expandedUnits.includes(unitIndex);
+            const unitCompleted = unit.items?.every(item => isCompleted(item._id)) || false;
+            const unitProgress = unit.items?.length 
+              ? Math.round((unit.items.filter(item => isCompleted(item._id)).length / unit.items.length) * 100)
+              : 0;
+
+            return (
+              <div key={unit._id || unitIndex} className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-sm">
+                {/* Unit Header */}
+                <button
+                  onClick={() => toggleUnit(unitIndex)}
+                  className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                >
+                  <div className="flex items-center gap-4 flex-1 text-left">
+                    <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center flex-shrink-0">
+                      {unitCompleted ? (
+                        <CheckCircle className="w-5 h-5 text-green-600" />
+                      ) : (
+                        <span className="text-sm font-semibold text-blue-600 dark:text-blue-400">
+                          {unitIndex + 1}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
+                        {unit.title}
+                      </h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        {unit.items?.length || 0} lessons • {unitProgress}% complete
+                      </p>
+                    </div>
+                  </div>
+                  {isExpanded ? (
+                    <ChevronUp className="w-5 h-5 text-gray-400" />
+                  ) : (
+                    <ChevronDown className="w-5 h-5 text-gray-400" />
+                  )}
+                </button>
+
+                {/* Unit Items */}
+                {isExpanded && (
+                  <div className="border-t border-gray-200 dark:border-gray-700">
+                    {unit.items?.map((item, itemIndex) => {
+                      const ItemIcon = getItemIcon(item.type);
+                      const itemCompleted = isCompleted(item._id);
+                      const isLocked = progress === 0; // Lock if not enrolled
+
+                      return (
+                        <div
+                          key={item._id || itemIndex}
+                          onClick={() => !isLocked && startLearning(unit._id, item._id)}
+                          className={`px-6 py-4 flex items-center gap-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors border-b border-gray-100 dark:border-gray-700 last:border-0 ${isLocked ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'}`}
+                        >
+                          <div className={`w-6 h-6 flex items-center justify-center ${itemCompleted ? 'text-green-600' : 'text-gray-400'}`}>
+                            {itemCompleted ? (
+                              <CheckCircle className="w-6 h-6" />
+                            ) : isLocked ? (
+                              <Lock className="w-5 h-5" />
+                            ) : (
+                              <ItemIcon className="w-5 h-5" />
+                            )}
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="font-medium text-gray-900 dark:text-white">
+                              {item.title}
+                            </h4>
+                            <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400 mt-1">
+                              <span className="capitalize">{item.type}</span>
+                              {item.duration && (
+                                <>
+                                  <span>•</span>
+                                  <span>{item.duration}</span>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                          {!isLocked && (
+                            <Play className="w-5 h-5 text-blue-600" />
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {(!module.units || module.units.length === 0) && (
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-12 text-center">
+            <BookOpen className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+              No content available yet
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400">
+              This module doesn't have any lessons yet. Check back soon!
+            </p>
           </div>
         )}
       </div>

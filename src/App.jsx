@@ -12,6 +12,8 @@ import ModuleLearningPage from './pages/ModuleLearningPage';
 import ComingSoonPage from './pages/ComingSoonPage';
 import AuthPage from './pages/AuthPage';
 import * as moduleApi from './api/moduleApi';
+import SettingsPage from './pages/SettingsPage';
+import RoadmapsPage from './pages/RoadmapsPage';
 
 function AppContent() {
   const [currentPage, setCurrentPage] = useState('modules');
@@ -121,16 +123,16 @@ function AppContent() {
           <Route index element={<Navigate to="/dashboard" replace />} />
           <Route path="dashboard" element={<StudentDashboard />} />
           <Route path="modules" element={<ModulesPage />} />
-          <Route path="roadmaps" element={<ComingSoonPage title="Roadmaps" />} />
+          <Route path="roadmaps" element={<RoadmapsPage />} />
           <Route path="events" element={<ComingSoonPage title="Events" />} />
           <Route path="messages" element={<ComingSoonPage title="Messages" />} />
           <Route path="students" element={<ComingSoonPage title="Students" />} />
-          <Route path="settings" element={<ComingSoonPage title="Settings" />} />
+          <Route path="settings" element={<SettingsPage />} />
+          <Route path="/modules/:moduleId" element={<ModuleDetailPage />} />
         </Route>
 
         {/* Module pages WITH Sidebar */}
         <Route path="/modules/:moduleId" element={<ModuleDetailPage />} />
-        <Route path="/modules/:moduleId/learn/:weekId/:itemId" element={<ModuleLearningPage />} />
         <Route path="/modules/:moduleId/learn/:unitId/:itemId" element={<ModuleLearningPage />} />
       </Routes>
     </Router>
