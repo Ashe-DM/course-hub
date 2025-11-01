@@ -3,9 +3,9 @@ import { BrowserRouter as Router, Routes, Route, Navigate, Outlet, useNavigate }
 import { UserProvider, useUser } from './context/UserContext';
 import { ProgressProvider } from './context/ProgressContext';
 import { ThemeProvider } from './context/ThemeContext';
-import Sidebar from './components/Sidebar';
-import TopNav from './components/TopNav';
-import Dashboard from './pages/Dashboard';
+import NewSidebar from './components/NewSidebar';
+import NewTopNav from './components/NewTopNav';
+import StudentDashboard from './pages/StudentDashboard';
 import ModulesPage from './pages/ModulesPage';
 import ModuleDetailPage from './pages/ModuleDetailPage';
 import ModuleLearningPage from './pages/ModuleLearningPage';
@@ -98,17 +98,11 @@ function AppContent() {
     }
 
     return (
-      <div className="flex h-screen">
-        <Sidebar 
-          currentPage={currentPage} 
-          setCurrentPage={(page) => { 
-            setCurrentPage(page); 
-            navigate(`/${page}`); 
-          }} 
-        />
+      <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+        <NewSidebar />
         <div className="flex-1 flex flex-col overflow-hidden">
-          <TopNav searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
-          <main className="flex-1 overflow-y-auto bg-gray-50">
+          <NewTopNav searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+          <main className="flex-1 overflow-y-auto">
             <Outlet />
           </main>
         </div>
@@ -125,21 +119,13 @@ function AppContent() {
         {/* Protected Routes WITH Sidebar and TopNav */}
         <Route path="/" element={<ProtectedLayoutWithSidebar />}>
           <Route index element={<Navigate to="/dashboard" replace />} />
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route 
-            path="modules" 
-            element={
-              <ModulesPage 
-                modules={modules} 
-                setSelectedModule={setSelectedModule}
-                setCurrentPage={setCurrentPage}
-                searchTerm={searchTerm}
-                setSearchTerm={setSearchTerm}
-              />
-            } 
-          />
-          <Route path="content" element={<ComingSoonPage title="All Content" />} />
-          <Route path="resources" element={<ComingSoonPage title="Resources" />} />
+          <Route path="dashboard" element={<StudentDashboard />} />
+          <Route path="modules" element={<ModulesPage />} />
+          <Route path="roadmaps" element={<ComingSoonPage title="Roadmaps" />} />
+          <Route path="events" element={<ComingSoonPage title="Events" />} />
+          <Route path="messages" element={<ComingSoonPage title="Messages" />} />
+          <Route path="students" element={<ComingSoonPage title="Students" />} />
+          <Route path="settings" element={<ComingSoonPage title="Settings" />} />
         </Route>
 
         {/* Module pages WITH Sidebar */}
