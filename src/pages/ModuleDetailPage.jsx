@@ -12,7 +12,7 @@ import { useUser } from '../context/UserContext';
 function ModuleDetailPage() {
   const { moduleId } = useParams();
   const navigate = useNavigate();
-  const { user } = useUser();
+  const { user, isMentor, isAdmin } = useUser();
   const { getModuleProgress, isCompleted, loadModuleProgress } = useProgress();
   const [module, setModule] = useState(null);
   const [loading, setLoading] = useState(true);

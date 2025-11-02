@@ -6,6 +6,9 @@ import { ThemeProvider } from './context/ThemeContext';
 import NewSidebar from './components/NewSidebar';
 import NewTopNav from './components/NewTopNav';
 import StudentDashboard from './pages/StudentDashboard';
+import DashboardRouter from './pages/DashboardRouter';
+import MentorDashboard from './pages/MentorDashboard';
+import AdminDashboard from './pages/AdminDashboard';
 import ModulesPage from './pages/ModulesPage';
 import ModuleDetailPage from './pages/ModuleDetailPage';
 import ModuleLearningPage from './pages/ModuleLearningPage';
@@ -14,6 +17,7 @@ import AuthPage from './pages/AuthPage';
 import * as moduleApi from './api/moduleApi';
 import SettingsPage from './pages/SettingsPage';
 import RoadmapsPage from './pages/RoadmapsPage';
+import ModuleCreatorPage from './pages/ModuleCreatorPage';
 
 function AppContent() {
   const [currentPage, setCurrentPage] = useState('modules');
@@ -121,8 +125,11 @@ function AppContent() {
         {/* Protected Routes WITH Sidebar and TopNav */}
         <Route path="/" element={<ProtectedLayoutWithSidebar />}>
           <Route index element={<Navigate to="/dashboard" replace />} />
-          <Route path="dashboard" element={<StudentDashboard />} />
+          <Route path="dashboard" element={<DashboardRouter />} />
           <Route path="modules" element={<ModulesPage />} />
+          {/* NEW: Module Creator Routes */}
+          <Route path="modules/create" element={<ModuleCreatorPage />} />
+          <Route path="modules/:moduleId/edit" element={<ModuleCreatorPage />} />
           <Route path="roadmaps" element={<RoadmapsPage />} />
           <Route path="events" element={<ComingSoonPage title="Events" />} />
           <Route path="messages" element={<ComingSoonPage title="Messages" />} />
