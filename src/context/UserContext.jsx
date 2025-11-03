@@ -1,6 +1,6 @@
 // UserContext.jsx
 import { createContext, useContext, useState, useEffect } from 'react';
-import { getCurrentUser, loginUser, registerUser, updateUserProfile } from './api/authApi';
+import { getCurrentUser, loginUser, registerUser, updateUserProfile } from '../api/authApi';
 
 const UserContext = createContext();
 
