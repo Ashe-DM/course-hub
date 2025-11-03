@@ -1,10 +1,8 @@
-//UserContext.jsx
+// UserContext.jsx
 import { createContext, useContext, useState, useEffect } from 'react';
-import axios from 'axios';
+import { getCurrentUser, loginUser, registerUser, updateUserProfile } from './api/authApi';
 
 const UserContext = createContext();
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 export function UserProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -20,15 +18,14 @@ export function UserProvider({ children }) {
       const storedUser = localStorage.getItem('user');
       
       if (token && storedUser) {
-        // Verify token is still valid
+        // Verify token is still valid using the API client
         try {
-          const response = await axios.get(`${API_URL}/api/auth/me`, {
-            headers: { Authorization: `Bearer ${token}` }
-          });
-          setUser(response.data);
-          localStorage.setItem('user', JSON.stringify(response.data));
+          const userData = await getCurrentUser(); // Uses the correct backend URL
+          setUser(userData);
+          localStorage.setItem('user', JSON.stringify(userData));
         } catch (error) {
           // Token invalid, clear storage
+          console.error('Auth check failed:', error);
           localStorage.removeItem('authToken');
           localStorage.removeItem('user');
           setUser(null);
@@ -46,13 +43,10 @@ export function UserProvider({ children }) {
 
   const login = async (email, password) => {
     try {
-      const response = await axios.post(`${API_URL}/api/auth/login`, {
-        email,
-        password
-      });
+      const response = await loginUser({ email, password }); // Uses the correct backend URL
 
-      if (response.data.success) {
-        const { token, user } = response.data;
+      if (response.success) {
+        const { token, user } = response;
         setUser(user);
         localStorage.setItem('authToken', token);
         localStorage.setItem('user', JSON.stringify(user));
@@ -85,14 +79,10 @@ export function UserProvider({ children }) {
 
   const register = async (name, email, password) => {
     try {
-      const response = await axios.post(`${API_URL}/api/auth/register`, {
-        name,
-        email,
-        password
-      });
+      const response = await registerUser({ name, email, password }); // Uses the correct backend URL
 
-      if (response.data.success) {
-        const { token, user } = response.data;
+      if (response.success) {
+        const { token, user } = response;
         setUser(user);
         localStorage.setItem('authToken', token);
         localStorage.setItem('user', JSON.stringify(user));
@@ -134,14 +124,12 @@ export function UserProvider({ children }) {
       const token = localStorage.getItem('authToken');
       
       if (token) {
-        const response = await axios.put(`${API_URL}/api/auth/profile`, updates, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const response = await updateUserProfile(updates); // Uses the correct backend URL
         
-        if (response.data.success) {
-          setUser(response.data.user);
-          localStorage.setItem('user', JSON.stringify(response.data.user));
-          return { success: true, user: response.data.user };
+        if (response.success) {
+          setUser(response.user);
+          localStorage.setItem('user', JSON.stringify(response.user));
+          return { success: true, user: response.user };
         }
       } else {
         // Mock update
