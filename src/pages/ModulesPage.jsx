@@ -1,3 +1,4 @@
+// ModulesPage.jsx
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -61,7 +62,7 @@ function ModulesPage() {
         level: module.level || 'beginner',
         students: module.students?.length || Math.floor(Math.random() * 5000) + 100,
         rating: module.rating || 4.8,
-        isMyModule: module.instructor?._id === user?._id || module.instructor === user?._id
+        isMyModule: true
       }));
       setModules(modulesWithProgress);
     } catch (error) {
@@ -196,6 +197,12 @@ function ModulesPage() {
                     Create Course
                   </button>
                 )}
+                <button
+                  onClick={() => navigate(`/modules/${module._id}/edit`)}  // ← This should work!
+                  className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"
+                >
+                  <Edit className="w-4 h-4" />
+                </button>
                 <button
                   onClick={() => setShowMyCoursesOnly(!showMyCoursesOnly)}
                   className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold shadow-lg transition-colors ${

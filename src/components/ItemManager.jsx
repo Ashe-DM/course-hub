@@ -1,3 +1,4 @@
+// ItemManager.jsx
 import { useState } from 'react';
 import { Plus, Edit, Trash2, BookOpen, Video, FileText, CheckSquare, Code } from 'lucide-react';
 import { addItemToUnit, updateItem, deleteItem } from '../api/itemApi';

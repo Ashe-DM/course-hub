@@ -1,3 +1,4 @@
+// ModuleCreatorPage.jsx
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
@@ -7,6 +8,7 @@ import {
 import { useUser } from '../context/UserContext';
 import { createModule, getModuleById, updateModule, addUnit } from '../api/moduleApi';
 import RichTextEditor from '../components/RichTextEditor';
+import AdvancedEditorWrapper from '../components/AdvancedEditorWrapper';
 
 function ModuleCreatorPage() {
   const { moduleId } = useParams();
@@ -522,12 +524,12 @@ function ModuleCreatorPage() {
 
                 {/* Content */}
                 {(itemFormData.type === 'reading' || itemFormData.type === 'article' || itemFormData.type === 'lab') && (
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                  <div className="mb-6">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Content
                     </label>
-                    <RichTextEditor
-                      value={itemFormData.content}
+                    <AdvancedEditorWrapper
+                      content={itemFormData.content}
                       onChange={(content) => setItemFormData({ ...itemFormData, content })}
                     />
                   </div>

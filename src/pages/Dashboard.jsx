@@ -1,3 +1,4 @@
+// Dashboard.jsx
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BookOpen, Target, CheckCircle, TrendingUp, PlayCircle } from 'lucide-react';

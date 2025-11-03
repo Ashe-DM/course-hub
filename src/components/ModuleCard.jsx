@@ -1,3 +1,4 @@
+// ModuleCard.jsx
 import { BookOpen, Clock, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 

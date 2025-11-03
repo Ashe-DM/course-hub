@@ -1,3 +1,4 @@
+// NewTopNav.jsx
 import { useState } from 'react';
 import { Search, Bell, Moon, Sun, Globe, X } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';

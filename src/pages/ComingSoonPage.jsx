@@ -1,3 +1,4 @@
+// ComingSoonPage.jsx
 import { useNavigate } from 'react-router-dom';
 import { 
   Rocket, ArrowLeft, Sparkles, Calendar, 
