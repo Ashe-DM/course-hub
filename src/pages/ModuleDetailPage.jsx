@@ -38,18 +38,24 @@ function ModuleDetailPage() {
   };
 
   const handleEnroll = async () => {
-    try {
-      setEnrolling(true);
-      await enrollUser(moduleId);
-      await loadModule(); // Reload to get updated enrollment status
-      alert('Successfully enrolled! You can now start learning.');
-    } catch (error) {
-      console.error('Error enrolling:', error);
-      alert('Failed to enroll. Please try again.');
-    } finally {
-      setEnrolling(false);
+  try {
+    setEnrolling(true);
+    await enrollUser(moduleId);
+    
+    if (module.units?.[0]?.items?.[0]) {
+      const firstUnit = module.units[0];
+      const firstItem = firstUnit.items[0];
+      navigate(`/modules/${moduleId}/learn/${firstUnit._id}/${firstItem._id}`);
+    } else {
+      alert('This module has no content yet.');
     }
-  };
+  } catch (error) {
+    console.error('Error enrolling:', error);
+    alert('Failed to enroll. Please try again.');
+  } finally {
+    setEnrolling(false);
+  }
+};
 
   const toggleUnit = (index) => {
     setExpandedUnits(prev => 
@@ -72,8 +78,28 @@ function ModuleDetailPage() {
   };
 
   const startLearning = (unitId, itemId) => {
+    console.log('🚀 Starting learning:', { moduleId, unitId, itemId });
+    
+    if (!unitId || !itemId) {
+      alert('Invalid lesson. Please contact support.');
+      return;
+    }
+    
     navigate(`/modules/${moduleId}/learn/${unitId}/${itemId}`);
   };
+  
+  useEffect(() => {
+  if (module) {
+    console.log('📦 Module loaded:', module.title);
+    console.log('📚 Units:', module.units?.length || 0);
+    module.units?.forEach((unit, i) => {
+      console.log(`  Unit ${i+1}: ${unit.title} (${unit.items?.length || 0} items)`);
+      unit.items?.forEach((item, j) => {
+        console.log(`    Item ${j+1}: ${item.title} (${item.type})`);
+      });
+    });
+  }
+}, [module]);
 
   const getCategoryColor = (category) => {
     const colors = {
@@ -201,13 +227,16 @@ function ModuleDetailPage() {
                     for (const unit of module.units || []) {
                       const incompleteItem = unit.items?.find(item => !isCompleted(item._id));
                       if (incompleteItem) {
-                        startLearning(unit._id, incompleteItem._id);
+                        console.log('📚 Continuing to:', incompleteItem.title);
+                        navigate(`/modules/${moduleId}/learn/${unit._id}/${incompleteItem._id}`);
                         return;
                       }
                     }
                     // If all complete, start from beginning
                     if (module.units?.[0]?.items?.[0]) {
-                      startLearning(module.units[0]._id, module.units[0].items[0]._id);
+                      navigate(`/modules/${moduleId}/learn/${module.units[0]._id}/${module.units[0].items[0]._id}`);
+                    } else {
+                      alert('This module has no content yet.');
                     }
                   }}
                   className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors font-semibold flex items-center justify-center gap-2 mb-4"

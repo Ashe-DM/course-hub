@@ -72,3 +72,49 @@ body.dark-mode .hover\:bg-gray-100:hover {
 body.dark-mode .hover\:text-gray-600:hover {
   color: #d1d5db !important;
 }
+
+/* FutureLearn-style code highlighting */
+.prose pre {
+  @apply bg-gray-900 text-gray-100 rounded-lg overflow-x-auto;
+}
+
+.prose pre code {
+  @apply bg-transparent text-gray-100;
+}
+
+.prose code {
+  @apply bg-gray-100 dark:bg-gray-800 text-pink-600 dark:text-pink-400 rounded px-1.5 py-0.5 text-sm font-mono;
+}
+
+.prose code::before,
+.prose code::after {
+  content: "" !important;
+}
+
+/* Image styling */
+.prose img {
+  @apply rounded-lg shadow-md my-8 mx-auto max-w-full;
+}
+
+/* Table styling */
+.prose table {
+  @apply w-full border-collapse my-8;
+}
+
+.prose th {
+  @apply bg-gray-100 dark:bg-gray-800 p-3 text-left font-semibold border border-gray-300 dark:border-gray-600;
+}
+
+.prose td {
+  @apply p-3 border border-gray-300 dark:border-gray-600;
+}
+
+/* Links */
+.prose a {
+  @apply text-pink-600 dark:text-pink-400 no-underline hover:underline;
+}
+
+/* Blockquotes */
+.prose blockquote {
+  @apply border-l-4 border-pink-600 pl-6 italic text-gray-600 dark:text-gray-400;
+}

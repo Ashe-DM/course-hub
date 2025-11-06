@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { useUser } from '../context/UserContext';
 import { createModule, getModuleById, updateModule, addUnit } from '../api/moduleApi';
-import RichTextEditor from '../components/RichTextEditor';
+import NotionStyleEditor from '../components/NotionStyleEditor';
 import AdvancedEditorWrapper from '../components/AdvancedEditorWrapper';
 
 function ModuleCreatorPage() {
@@ -528,7 +528,7 @@ function ModuleCreatorPage() {
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Content
                     </label>
-                    <AdvancedEditorWrapper
+                    <NotionStyleEditor
                       content={itemFormData.content}
                       onChange={(content) => setItemFormData({ ...itemFormData, content })}
                     />
