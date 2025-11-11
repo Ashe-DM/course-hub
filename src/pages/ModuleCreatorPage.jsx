@@ -8,7 +8,7 @@ import {
 import { useUser } from '../context/UserContext';
 import { createModule, getModuleById, updateModule, addUnit } from '../api/moduleApi';
 import NotionStyleEditor from '../components/NotionStyleEditor';
-import AdvancedEditorWrapper from '../components/AdvancedEditorWrapper';
+// import AdvancedEditorWrapper from '../components/AdvancedEditorWrapper';
 
 function ModuleCreatorPage() {
   const { moduleId } = useParams();

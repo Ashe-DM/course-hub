@@ -1,12 +1,10 @@
-import { useEditor, EditorContent, BubbleMenu } from '@tiptap/react';
+import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Image from '@tiptap/extension-image';
 import Link from '@tiptap/extension-link';
 import TextAlign from '@tiptap/extension-text-align';
 import Underline from '@tiptap/extension-underline';
 import Placeholder from '@tiptap/extension-placeholder';
-import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
-import { common, createLowlight } from 'lowlight';
 import { 
   Bold, Italic, Underline as UnderlineIcon, Code, 
   Heading1, Heading2, Heading3, List, ListOrdered,
@@ -14,9 +12,6 @@ import {
   AlignLeft, AlignCenter, AlignRight, Quote
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
-
-// Initialize syntax highlighting
-const lowlight = createLowlight(common);
 
 function NotionStyleEditor({ value = '', onChange, readOnly = false }) {
   const [showImageDialog, setShowImageDialog] = useState(false);
@@ -28,7 +23,11 @@ function NotionStyleEditor({ value = '', onChange, readOnly = false }) {
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
-        codeBlock: false, // Disable default code block
+        codeBlock: {
+          HTMLAttributes: {
+            class: 'relative rounded-lg bg-gray-900 dark:bg-black text-gray-100 p-4 my-4 overflow-x-auto font-mono text-sm'
+          }
+        }
       }),
       Underline,
       Placeholder.configure({
@@ -56,12 +55,6 @@ function NotionStyleEditor({ value = '', onChange, readOnly = false }) {
       }),
       TextAlign.configure({
         types: ['heading', 'paragraph'],
-      }),
-      CodeBlockLowlight.configure({
-        lowlight,
-        HTMLAttributes: {
-          class: 'relative rounded-lg bg-gray-900 dark:bg-black text-gray-100 p-4 my-4 overflow-x-auto font-mono text-sm'
-        }
       })
     ],
     content: value || '',
@@ -121,72 +114,21 @@ function NotionStyleEditor({ value = '', onChange, readOnly = false }) {
 
   return (
     <div className="relative border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 min-h-[500px]">
-      {/* Bubble Menu - appears when text is selected */}
-      {editor && (
-        <BubbleMenu
-          editor={editor}
-          tippyOptions={{ duration: 100 }}
-          className="flex items-center gap-1 bg-gray-900 dark:bg-black rounded-lg shadow-xl p-1 border border-gray-700"
-        >
-          <BubbleButton
-            onClick={() => editor.chain().focus().toggleBold().run()}
-            isActive={editor.isActive('bold')}
-            title="Bold"
-          >
-            <Bold className="w-4 h-4" />
-          </BubbleButton>
-
-          <BubbleButton
-            onClick={() => editor.chain().focus().toggleItalic().run()}
-            isActive={editor.isActive('italic')}
-            title="Italic"
-          >
-            <Italic className="w-4 h-4" />
-          </BubbleButton>
-
-          <BubbleButton
-            onClick={() => editor.chain().focus().toggleUnderline().run()}
-            isActive={editor.isActive('underline')}
-            title="Underline"
-          >
-            <UnderlineIcon className="w-4 h-4" />
-          </BubbleButton>
-
-          <BubbleButton
-            onClick={() => editor.chain().focus().toggleCode().run()}
-            isActive={editor.isActive('code')}
-            title="Inline Code"
-          >
-            <Code className="w-4 h-4" />
-          </BubbleButton>
-
-          <div className="w-px h-6 bg-gray-700 mx-1"></div>
-
-          <BubbleButton
-            onClick={() => setShowLinkDialog(true)}
-            isActive={editor.isActive('link')}
-            title="Add Link"
-          >
-            <LinkIcon className="w-4 h-4" />
-          </BubbleButton>
-        </BubbleMenu>
-      )}
-
-      {/* Floating Menu - Type '/' to trigger */}
+      
+      {/* Floating hint */}
       <div className="absolute top-4 left-4 text-xs text-gray-400 pointer-events-none z-10">
         Press <kbd className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded border border-gray-300 dark:border-gray-600">
           /
         </kbd> for commands
       </div>
 
-      {/* Slash Command Menu */}
-      <SlashCommandMenu editor={editor} />
-
       {/* Editor Content */}
       <EditorContent editor={editor} className="min-h-[400px]" />
 
-      {/* Quick Action Buttons (Bottom Toolbar) */}
+      {/* Toolbar */}
       <div className="sticky bottom-0 left-0 right-0 bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-2 flex flex-wrap gap-1">
+        
+        {/* Headings */}
         <ToolbarButton
           onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
           isActive={editor.isActive('heading', { level: 1 })}
@@ -213,6 +155,42 @@ function NotionStyleEditor({ value = '', onChange, readOnly = false }) {
 
         <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1"></div>
 
+        {/* Text formatting */}
+        <ToolbarButton
+          onClick={() => editor.chain().focus().toggleBold().run()}
+          isActive={editor.isActive('bold')}
+          title="Bold"
+        >
+          <Bold className="w-4 h-4" />
+        </ToolbarButton>
+
+        <ToolbarButton
+          onClick={() => editor.chain().focus().toggleItalic().run()}
+          isActive={editor.isActive('italic')}
+          title="Italic"
+        >
+          <Italic className="w-4 h-4" />
+        </ToolbarButton>
+
+        <ToolbarButton
+          onClick={() => editor.chain().focus().toggleUnderline().run()}
+          isActive={editor.isActive('underline')}
+          title="Underline"
+        >
+          <UnderlineIcon className="w-4 h-4" />
+        </ToolbarButton>
+
+        <ToolbarButton
+          onClick={() => editor.chain().focus().toggleCode().run()}
+          isActive={editor.isActive('code')}
+          title="Inline Code"
+        >
+          <Code className="w-4 h-4" />
+        </ToolbarButton>
+
+        <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1"></div>
+
+        {/* Paragraph */}
         <ToolbarButton
           onClick={() => editor.chain().focus().setParagraph().run()}
           isActive={editor.isActive('paragraph')}
@@ -221,6 +199,7 @@ function NotionStyleEditor({ value = '', onChange, readOnly = false }) {
           <Type className="w-4 h-4" />
         </ToolbarButton>
 
+        {/* Lists */}
         <ToolbarButton
           onClick={() => editor.chain().focus().toggleBulletList().run()}
           isActive={editor.isActive('bulletList')}
@@ -247,6 +226,7 @@ function NotionStyleEditor({ value = '', onChange, readOnly = false }) {
 
         <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1"></div>
 
+        {/* Code block */}
         <ToolbarButton
           onClick={() => editor.chain().focus().toggleCodeBlock().run()}
           isActive={editor.isActive('codeBlock')}
@@ -255,6 +235,7 @@ function NotionStyleEditor({ value = '', onChange, readOnly = false }) {
           <Code className="w-4 h-4" />
         </ToolbarButton>
 
+        {/* Image */}
         <ToolbarButton
           onClick={() => setShowImageDialog(true)}
           title="Insert Image"
@@ -262,8 +243,17 @@ function NotionStyleEditor({ value = '', onChange, readOnly = false }) {
           <ImageIcon className="w-4 h-4" />
         </ToolbarButton>
 
+        {/* Link */}
+        <ToolbarButton
+          onClick={() => setShowLinkDialog(true)}
+          title="Insert Link"
+        >
+          <LinkIcon className="w-4 h-4" />
+        </ToolbarButton>
+
         <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1"></div>
 
+        {/* Text alignment */}
         <ToolbarButton
           onClick={() => editor.chain().focus().setTextAlign('left').run()}
           isActive={editor.isActive({ textAlign: 'left' })}
@@ -352,29 +342,6 @@ function NotionStyleEditor({ value = '', onChange, readOnly = false }) {
   );
 }
 
-// Slash Command Menu Component
-function SlashCommandMenu({ editor }) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [search, setSearch] = useState('');
-
-  const commands = [
-    { label: 'Heading 1', icon: <Heading1 className="w-4 h-4" />, command: () => editor.chain().focus().toggleHeading({ level: 1 }).run() },
-    { label: 'Heading 2', icon: <Heading2 className="w-4 h-4" />, command: () => editor.chain().focus().toggleHeading({ level: 2 }).run() },
-    { label: 'Heading 3', icon: <Heading3 className="w-4 h-4" />, command: () => editor.chain().focus().toggleHeading({ level: 3 }).run() },
-    { label: 'Bullet List', icon: <List className="w-4 h-4" />, command: () => editor.chain().focus().toggleBulletList().run() },
-    { label: 'Numbered List', icon: <ListOrdered className="w-4 h-4" />, command: () => editor.chain().focus().toggleOrderedList().run() },
-    { label: 'Quote', icon: <Quote className="w-4 h-4" />, command: () => editor.chain().focus().toggleBlockquote().run() },
-    { label: 'Code Block', icon: <Code className="w-4 h-4" />, command: () => editor.chain().focus().toggleCodeBlock().run() },
-  ];
-
-  const filteredCommands = commands.filter(cmd => 
-    cmd.label.toLowerCase().includes(search.toLowerCase())
-  );
-
-  // This is simplified - in real Notion, you'd use Tiptap's suggestion extension
-  return null; // Placeholder - proper implementation requires suggestion extension
-}
-
 // Toolbar Button Component
 function ToolbarButton({ onClick, isActive, disabled, title, children }) {
   return (
@@ -388,24 +355,6 @@ function ToolbarButton({ onClick, isActive, disabled, title, children }) {
           ? 'bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400'
           : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
       } ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-    >
-      {children}
-    </button>
-  );
-}
-
-// Bubble Menu Button Component
-function BubbleButton({ onClick, isActive, title, children }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      title={title}
-      className={`p-2 rounded transition-colors ${
-        isActive
-          ? 'bg-blue-600 text-white'
-          : 'text-gray-300 hover:bg-gray-800 hover:text-white'
-      }`}
     >
       {children}
     </button>
